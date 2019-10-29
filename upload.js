@@ -3,7 +3,7 @@ const Xlsx = require("xlsx");
 const ProgressBar = require("progress");
 
 const debug = true; // headless mode strangely not working
-const delay = 10000; // up to how fast your computer loads pages
+const delay = 5000; // up to how fast your computer loads pages
 
 const username = process.argv[2];
 const password = process.argv[3];
@@ -147,7 +147,7 @@ const scholarships = {
   电子系1998级校友奖学基金: [
     { code: "J7232020", amount: 1800, type: "院管院分" }
   ],
-  常锋奖学金: [{ code: "J7235020", amount: 2000, type: "院管院分" }],
+  常锋奖学金: [{ code: "J7234020", amount: 2000, type: "院管院分" }],
   校设奖学金: [
     { code: "J1022000", amount: 0, type: "校管院分" },
     { code: "J1022010", amount: 1000, type: "校管院分" },
@@ -195,7 +195,7 @@ const departmentDistributedApplications = applications.filter(
     headless: !debug
   });
   const page = await browser.newPage();
-  await page.setViewport({ width: 1280, height: 720 });
+  await page.setViewport({ width: 1920, height: 1080 });
 
   bar.interrupt("[progress] logging in...");
   await page.goto("https://info.tsinghua.edu.cn/");
@@ -228,20 +228,16 @@ const departmentDistributedApplications = applications.filter(
   await schoolManagedTab.click();
   await page.waitFor(1000);
 
-  let i = 0;
   for (const application of schoolManagedApplications) {
     try {
       const studentId = application[0].toString();
       const honor = application[3].trim();
       const scholarshipCode = application[5].trim();
       await fillForm(page, "校管校分", studentId, honor, scholarshipCode);
-      i++;
       bar.tick();
-      break;
     } catch (e) {
       console.error("Upload failed at:");
       console.error(application);
-      throw e;
     }
   }
 
@@ -260,12 +256,10 @@ const departmentDistributedApplications = applications.filter(
       const honor = application[3].trim();
       const scholarshipCode = application[5].trim();
       await fillForm(page, "校管院分", studentId, honor, scholarshipCode);
-      i++;
       bar.tick();
     } catch (e) {
       console.error("Upload failed at:");
       console.error(application);
-      throw e;
     }
   }
 
@@ -284,12 +278,10 @@ const departmentDistributedApplications = applications.filter(
       const honor = application[3].trim();
       const scholarshipCode = application[5].trim();
       await fillForm(page, "院管院分", studentId, honor, scholarshipCode);
-      i++;
       bar.tick();
     } catch (e) {
       console.error("Upload failed at:");
       console.error(application);
-      throw e;
     }
   }
 
@@ -308,6 +300,8 @@ const fillForm = async (page, type, studentId, honorName, scholarshipCode) => {
   await page.waitFor(500);
   const honorSelection = await page.$("#select2-jllxm-container");
   await honorSelection.tap();
+  await honorSelection.tap();
+  await honorSelection.tap();
   await page.waitForSelector(".select2-results__option");
   const honorList = await page.$$(".select2-results__option");
   const honors =
@@ -318,7 +312,10 @@ const fillForm = async (page, type, studentId, honorName, scholarshipCode) => {
       : honorsForDepartmentDistributed;
   await honorList[honors[honorName]].tap();
 
+  await page.waitFor(500);
   const scholarshipSelection = await page.$("#select2-dm-container");
+  await scholarshipSelection.tap();
+  await scholarshipSelection.tap();
   await scholarshipSelection.tap();
   await page.waitFor(".select2-results__option");
   const scholarshipList = await page.$$(".select2-results__option");
