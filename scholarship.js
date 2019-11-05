@@ -220,7 +220,7 @@ const departmentDistributedApplications = applications.filter(
   const scholarshipTab = (await page.$$(".fir_li"))[1];
   await scholarshipTab.click();
   await page.waitFor(1000);
-
+  throw "";
   bar.interrupt("[progress] start to upload 校管校分...");
   const schoolManagedTab = await page.waitForSelector(
     'a[data="/f/bksjzd/jxj/v_bj_jxj_xflrb/xsgzz/beforePageList"]'
